@@ -1,4 +1,5 @@
 <?php
+
 namespace Imefisto\PsrSwoole;
 
 use Psr\Http\Message\RequestInterface;
@@ -24,16 +25,14 @@ class Request implements RequestInterface
     {
         return !empty($this->requestTarget)
             ? $this->requestTarget
-            : ($this->requestTarget = $this->buildRequestTarget())
-            ;
+            : ($this->requestTarget = $this->buildRequestTarget());
     }
 
     private function buildRequestTarget()
     {
         $queryString = !empty($this->swooleRequest->server['query_string'])
             ? '?' . $this->swooleRequest->server['query_string']
-            : ''
-            ;
+            : '';
 
         return $this->swooleRequest->server['request_uri']
             . $queryString;
@@ -50,13 +49,12 @@ class Request implements RequestInterface
     {
         return !empty($this->method)
             ? $this->method
-            : ($this->method = $this->swooleRequest->server['request_method'])
-            ;
+            : ($this->method = $this->swooleRequest->server['request_method']);
     }
 
     public function withMethod($method)
     {
-        $validMethods = ['options','get','head','post','put','delete','trace','connect'];
+        $validMethods = ['options', 'get', 'head', 'post', 'put', 'delete', 'trace', 'connect'];
         if (!in_array(strtolower($method), $validMethods)) {
             throw new \InvalidArgumentException('Invalid HTTP method');
         }
@@ -76,8 +74,7 @@ class Request implements RequestInterface
 
         $uri = (!empty($userInfo) ? '//' . $userInfo . '@' : '')
             . $this->swooleRequest->header['host']
-            . $this->getRequestTarget()
-            ;
+            . $this->getRequestTarget();
 
         return $this->uri = $this->uriFactory->createUri(
             $uri
@@ -127,7 +124,7 @@ class Request implements RequestInterface
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -141,17 +138,16 @@ class Request implements RequestInterface
             if (strtolower($name) == strtolower($key)) {
                 return is_array($value)
                     ? $value
-                    : [$value]
-                    ;
+                    : [$value];
             }
         }
     }
-    
+
     public function getHeaderLine($name)
     {
         foreach ($this->swooleRequest->header as $key => $value) {
             if (strtolower($name) == strtolower($key)) {
-                return implode(',', $value);
+                return is_array($value) ? implode(',', $value) : $value;
             }
         }
 
